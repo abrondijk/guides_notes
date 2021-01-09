@@ -6,7 +6,7 @@ Attempted to use with my familiebrondijk.nl but fuck that shit cause its shitty.
 
 ## Setup
 
-1. Create an app password for gmail [here]()
+1. Create an app password for gmail [here](https://myaccount.google.com/security)
 2. Create a password file in `/etc/postfix/` with the following contents:
 
     ```password
@@ -31,10 +31,25 @@ Attempted to use with my familiebrondijk.nl but fuck that shit cause its shitty.
     inet_interfaces = all
     ```
 
+6. Reload the postfix service with `postfix reload`
+7. Test whether emails can be send with the `sendmail` command. Exmaple: `sendmail <emailaddr> ENTER test ENTER .`
 
+### **Optional** Remove the sender name from saying root
 
+8. Create a file called `/etc/postfix/smtp_header_checks` with the following contents:
 
+    ```smtp_header_checks
+    /^From:.*/ REPLACE From: HOSTNAME-alert <HOSTNAME-alert@something.com>
+    ```
+
+9. Add that file to the main.cf by adding:
+
+    ```main.cf
+    smtp_header_checks = pcre:/etc/postfix/smtp_header_checks
+    ```
+
+10. Finally install the package required for this: `apt install postfix-pcre`
 
 ### Links
 
-- https://forum.proxmox.com/threads/get-postfix-to-send-notifications-email-externally.59940/
+- <https://forum.proxmox.com/threads/get-postfix-to-send-notifications-email-externally.59940/>
