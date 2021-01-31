@@ -1,8 +1,4 @@
-# Enabling email notifcations 
-
-## Details
-
-Attempted to use with my familiebrondijk.nl but fuck that shit cause its shitty.
+# Enabling email notifcations
 
 ## Setup
 
