@@ -22,19 +22,3 @@ All things initially done before setting up any containers/VMs
 
 6. Setup email notifications
     - See `Enable Mail Notifications.md`
-
-## Some ZFS tweaks/settings
-[Source](https://pve.proxmox.com/wiki/ZFS_on_Linux#_limit_zfs_memory_usage)
-
-7. Change ZFS max ram allocation
-    - Edit `/etc/modprobe.d/zfs.conf`
-    - Insert `options zfs zfs_arc_max=<arc_size>` where the size is in bytes
-
-8. Enable ZFS mail events
-    - Make sure the package is installed `apt-get install zfs-zed`
-    - Edit `/etc/zfs/zed.d/zed.rc`
-    - Uncomment `ZED_EMAIL_ADDR="root"`
-
-9. Setup a ZFS Scrub cronjob
-    - `crontab -e`, insert `0 2 * * 1 /sbin/zpool scrub <poolname>`
-    - Enable email notifications `MAILTO="<emailaddr>"`

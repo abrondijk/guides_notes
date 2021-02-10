@@ -4,6 +4,8 @@
 
 - Proxmox VE 6.3-2
 
+Test torrent VPN connection with ipleak.net
+
 ## Prerequisites
 
 - Container has to be priviliged (or mapped gid/uid)
@@ -58,12 +60,12 @@
         ```
 
 7. **(Optional)** To allow the local network to access the container, add a new ip rule and apply it after the network interface comes online
-    - Add the following to `/etc/network/interfaces`:
+    - Add the following to `/etc/network/interfaces` und er the main interface:
 
         ```bash
-        ip rule add from <x.x.x.x> table 128
-        ip route add table 128 to y.y.y.y/yy dev eth0
-        ip route add table 128 default via z.z.z.z
+        post-up ip rule add from <x.x.x.x> table 128
+        post-up ip route add table 128 to y.y.y.y/yy dev eth0
+        post-up ip route add table 128 default via z.z.z.z
         ```
 
         Where `x.x.x.x` is the container IP, `y.y.y.y/yy` is the    subnet and `z.z.z.z` is the default gateway
