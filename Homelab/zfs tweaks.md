@@ -37,3 +37,7 @@ zfs set quota=500m <poolname>/<filesystemname>
 zfs set reservation=200m <poolname>/<filesystemname>
 
 ```
+
+## Useful links
+
+- <https://jrs-s.net/2018/08/17/zfs-tuning-cheat-sheet/>
