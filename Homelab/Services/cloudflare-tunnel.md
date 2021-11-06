@@ -1,5 +1,10 @@
 # How to create cloudfare tunnels for services
-
+## Notes
+ - It might be a better idea to use a generic `/etc/.cloudflared/config.yml`
+   - In that case using `cloudflared service install` is easier than setting up your own systemd service
+   - Adding more services is as simple as adding another `-hostname` entry to the `config.yaml` and restarting your service
+ - Updating is done using `cloudflared update`
+ - Nextcloud relies on an array of trusted domain names [https://help.nextcloud.com/t/howto-add-a-new-trusted-domain/26]()
 ## Setup
 First, download `cloudflared` from 
  - [https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation]().
@@ -34,7 +39,7 @@ cloudflared login
 ```
 Simply follow the promts and it will generate a cert.perm that contains a login certificate
 
-## Creating a HTTP tunnel
+## Standard HTTP Tunnel setup
 From here you can create a tunnel, I will be making one for nextcloud:
 ```
 cloudflare tunnel create nextcloud
@@ -68,7 +73,13 @@ ingress:
 
 warp-routing:
   enabled: true 
-  ```
+```
+
+Verify your config file:
+```
+cloudflared tunnel --config .cloudflared/nextcloud.yaml ingress validate
+```
+  
 From here you can actually test your tunnel, do note that it is important that the subdomain you set in the `.yaml` does _not_ already exist on your domain.
 ```
 cloudflared tunnel --config .cloudflared/nextcloud.yaml run nextcloud
