@@ -18,12 +18,13 @@ This was a pain to set up, tried almost everything until I finally found a guide
     ```
     The 2775 mask will make sure that all newly created files and directories, will have the same mask
 
-6. ***Optional:*** Allow for ACL to be used on ZFS: `zfs set acltype=posixacl /pool/mount/point`
+6. ***Optional:*** Allow for ACL to be used on ZFS: `zfs set acltype=posixacl pool_name`
 7. Do the following on the proxmox host:
     ```
     setfacl -Rm g:<GID>:rwx,d:g:<GID>:rwx <path>
     setfacl -Rm u:<UID>:rwx,d:u:<UID>:rwx <path>
     ```
+    _note, `apt-get install acl` to get the setfacl command_
 8. Now finally inside the LXC, check whether the bindmount exists and is owned by a uid and gid other than 65536: `ls -ln`
 9. Add a user with the same uid and gid as the bindmount: `useradd --uid <UID> <username>`
 
