@@ -4,6 +4,10 @@
 
 This was a pain to set up, tried almost everything until I finally found a guide that almost worked. Added a few things and finally there was the desired result.
 
+The ID's you setup in the proxmox host will be passed onto the LXC, however 10.000 (ten-thousand) will be subtracted from it.
+
+This means that creating a user in the host with PUID 101000 will be presented in the LXC as 1000.
+
 ## Setup
 
 1. Add the mount to the LXC with `mpX: /path/on/host/,mp=/path/on/container/`
