@@ -16,28 +16,27 @@ Login as your new user, and we can get started.
 ## Dependencies
 These I know for your that you'll need.
 ``` 
-apt-get install -y mkvtoolnix ccextractor handbrake-cli unzip 
+sudo apt-get install -y wget mkvtoolnix ccextractor handbrake-cli unzip 
 ```
 
-These may or may not be necessary, I got these from the Tdarr dockerfile and installed them before testing whether or not it worked without them, please update this guide if you find out more.
+## Set up FFMPEG
+Got this from the dockerfile, works for me:
 ```
-apt-get install -y software-properties-common git trash-cli \
-                    curl autoconf automake autopoint appstream \
-                    build-essential cmake git libass-dev libbz2-dev \
-                    libfontconfig1-dev libfreetype6-dev libfribidi-dev \
-                    libharfbuzz-dev libjansson-dev liblzma-dev \ 
-                    libmp3lame-dev libnuma-dev libogg-dev libopus-dev \
-                    libsamplerate-dev libspeex-dev libtheora-dev libtool \
-                    libtool-bin libturbojpeg0-dev libvorbis-dev libx264-dev \
-                    libxml2-dev libvpx-dev m4 make meson nasm ninja-build \
-                    patch pkg-config python tar zlib1g-dev libva-dev libdrm-dev
+wget https://repo.jellyfin.org/releases/server/ubuntu/versions/jellyfin-ffmpeg/4.3.2-1/jellyfin-ffmpeg_4.3.2-1-focal_amd64.deb
+sudo apt install -y ./jellyfin-ffmpeg_4.3.2-1-focal_amd64.deb
+sudo ln -s /usr/lib/jellyfin-ffmpeg/ffmpeg /usr/local/bin/ffmpeg
 ```
 
 ## Downloading and running Tdarr itself
 Download updater, See an overview of all versions here: [https://f000.backblazeb2.com/file/tdarrs/versions.json](https://f000.backblazeb2.com/file/tdarrs/versions.json), newest are lowest.
+Also extract file, and run updater:
 ```
-wget https://f000.backblazeb2.com/file/tdarrs/versions/LATEST_VERSION_HERE/linux_x64/Tdarr_Updater.zip
+wget https://f000.backblazeb2.com/file/tdarrs/versions/2.00.12/linux_x64/Tdarr_Updater.zip
 unzip Tdarr_Updater.zip
+./Tdarr_Updater
+```
+Set permissions on the actual programs:
+```
 chmod +x Tdarr_Server/Tdarr_Server
 chmod +x Tdarr_Node/Tdarr_Node
 ```
@@ -71,7 +70,7 @@ Documentation=https://github.com/HaveAGitGat/Tdarr
 [Service]
 Type=simple
 User=tdarr
-ExecStart=/usr/bin/node /home/tdarr/Tdarr_Server/Tdarr_Server
+ExecStart=/home/tdarr/Tdarr_Server/Tdarr_Server
 Restart=on-failure
 
 [Install]
@@ -87,7 +86,7 @@ After=tdarr_server.service
 [Service]
 Type=simple
 User=tdarr
-ExecStart=/usr/bin/node /home/tdarr/Tdarr_Node/Tdarr_Node
+ExecStart=/home/tdarr/Tdarr_Node/Tdarr_Node
 Restart=on-failure
 
 [Install]
@@ -95,12 +94,20 @@ WantedBy=multi-user.target
 ```
 Reload your services:
 ```
-systemctl daemon-reload
+sudo systemctl daemon-reload
 ```
 And you can enabel and start them:
 ```
-systemctl enable tdarr_server
-systemctl enable tdarr_node
-systemctl start tdarr_server
-systemctl start tdarr_node
+sudo systemctl enable tdarr_server
+sudo systemctl enable tdarr_node
+sudo systemctl start tdarr_server
+sudo systemctl start tdarr_node
+```
+
+## Finishing
+And that's it, you can now visit your tdarr page at http://whatever.ip:8065, given that you didn't change the ports in the configuration step.
+You may also remove the sudo rights from your tdarr user if you so desire:
+
+```
+usermod -G sudo tdarr
 ```
