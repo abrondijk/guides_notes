@@ -1,4 +1,4 @@
-# TDarr installation
+# Tdarr installation
 First attempt, rough guide.
 Start by setting up Nvidia passtrough if you have a capable GPU. See guide in current folder.
 
@@ -54,6 +54,12 @@ Tdarr_Node/./Tdarr_Node
 ```
 ![2021-12-19T13:52:31_987x255_scrot](https://user-images.githubusercontent.com/20231417/146675533-603295dc-b234-4bbb-99b7-26f4cd28540a.png)
 
+Create a cache folder where files will be stored during transcoding:
+```
+mkdir -p cache/movies cache/shows cache/music
+```
+You can use a different layout of course, this just seemed nice to me.
+
 ## Configuration
 
 Close the node, and we'll get on to editing the configs.
@@ -66,22 +72,27 @@ Also set your ffmpeg path to the one we installed earlier, or else your transcod
 In the end, my `configs/Tdarr_Node_Config.json` ended up looking like this:
 ```json
 {
-  "nodeID": "musty-moa",
+  "nodeID": "key-kagu",
   "nodeIP": "0.0.0.0",
   "nodePort": "8267",
   "serverIP": "0.0.0.0",
   "serverPort": "8266",
   "handbrakePath": "",
-  "ffmpegPath": "/usr/local/bin/ffmpeg",
+  "ffmpegPath": "",
   "mkvpropeditPath": "",
   "pathTranslators": [
     {
       "server": "mnt/general",
       "node": "/mnt/general"
+    },
+    {
+      "server": "home/tdarr/cache",
+      "node": "/home/tdarr/cache"
     }
   ]
 }
 ```
+Note that I also added a translator for the path to the the cache folder, this will be usefull later.
 
 If, like me, you're running the Node and the Server on the same host, there's no need to edit the IP addresses.
 The `configs/Tdarr_Server_Config.json` contains just IP and port settings, along with handbrake and ffmpeg paths, but I haven't had to edit those.
