@@ -38,6 +38,12 @@ zfs set reservation=200m <poolname>/<filesystemname>
 
 ```
 
+### "Disk quota exceeded" errors
+```
+zfs set quota=none pool_name_here
+```
+
+
 ## Useful links
 
 - <https://jrs-s.net/2018/08/17/zfs-tuning-cheat-sheet/>
