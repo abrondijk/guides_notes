@@ -78,7 +78,7 @@ In the end, my `configs/Tdarr_Node_Config.json` ended up looking like this:
   "serverIP": "0.0.0.0",
   "serverPort": "8266",
   "handbrakePath": "",
-  "ffmpegPath": "",
+  "ffmpegPath": "/usr/local/bin/ffmpeg",
   "mkvpropeditPath": "",
   "pathTranslators": [
     {
