@@ -54,8 +54,34 @@ Tdarr_Node/./Tdarr_Node
 ```
 ![2021-12-19T13:52:31_987x255_scrot](https://user-images.githubusercontent.com/20231417/146675533-603295dc-b234-4bbb-99b7-26f4cd28540a.png)
 
+## Configuration
+
 Close the node, and we'll get on to editing the configs.
 Open `configs/Tdarr_Node_Config.json` and setup your media paths, this is also where you can edit the Node port and the target Server port.
+
+Add the path to your media  **_`without a leading /`_**  to the server field, and the same but **_`with the leading /`_** for the node's path to the libary.
+
+Also set your ffmpeg path to the one we installed earlier, or else your transcodes won't be able to use your Nvidia GPU.
+
+In the end, my `configs/Tdarr_Node_Config.json` ended up looking like this:
+```json
+{
+  "nodeID": "musty-moa",
+  "nodeIP": "0.0.0.0",
+  "nodePort": "8267",
+  "serverIP": "0.0.0.0",
+  "serverPort": "8266",
+  "handbrakePath": "",
+  "ffmpegPath": "/usr/local/bin/ffmpeg",
+  "mkvpropeditPath": "",
+  "pathTranslators": [
+    {
+      "server": "mnt/general",
+      "node": "/mnt/general"
+    }
+  ]
+}
+```
 
 If, like me, you're running the Node and the Server on the same host, there's no need to edit the IP addresses.
 The `configs/Tdarr_Server_Config.json` contains just IP and port settings, along with handbrake and ffmpeg paths, but I haven't had to edit those.
