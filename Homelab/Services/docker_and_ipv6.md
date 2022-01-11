@@ -44,6 +44,7 @@ Not sure if that's actually needed for every system but for mine it was.
 
 You might also want to cal `sysctl --system` yourself to apply the settings right now.
 
+## "Finishing" up
 Now setup an IPv6 compatible container and give it a static IP. Do note that Docker port mapping doesn't apply to IPv6. Whatever port the container uses internally is what will be published on IPv6. This is because NAT isn't used for IPv6.
 
 After setting up your container you just need to add a specific IP to your physical NIC so the network knows where to look for it:
