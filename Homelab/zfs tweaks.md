@@ -20,6 +20,14 @@ Some basic, and actually readable info [here](https://www.thegeekdiary.com/zfs-t
     - `crontab -e`, insert `0 2 * * 1 /sbin/zpool scrub <poolname>`
     - Enable email notifications `MAILTO="<emailaddr>"`
 
+4. Set weird default values to better values
+
+    ```bash
+    zfs set atime=off <pool>
+    zfs set recordsize=16K <pool>
+    zfs set xattr=sa <pool>
+    ```
+
 ## ZFS filesystems
 
 Can be useful to split a pool in different sections and reserve space for said sections.
@@ -42,6 +50,8 @@ zfs set reservation=200m <poolname>/<filesystemname>
 ```
 zfs set quota=none pool_name_here
 ```
+
+
 
 
 ## Useful links
