@@ -108,10 +108,10 @@ sudo kubectl get pods --all-namespaces
 sudo kubectl logs -n kube-system kube-vip-<id>
 
 # Add the other master nodes
-curl -sfL https://get.k3s.io | K3S_TOKEN="nnFEDhSAcKKeusXhSdnp" sh -s - server --server <ip or hostname of initial master node>:6443 --disable traefik --disable servicelb --tls-san cluster.example.com --node-taint CriticalAddonsOnly=true:NoExecute
+curl -sfL https://get.k3s.io | K3S_TOKEN="nnFEDhSAcKKeusXhSdnp" sh -s - server --server https://<ip or hostname of initial master node>:6443 --disable traefik --disable servicelb --tls-san cluster.example.com --node-taint CriticalAddonsOnly=true:NoExecute
 
 # Add the worker nodes
-curl -sfL https://get.k3s.io | K3S_URL="<ip or hostname of VIP ip>:6443" K3S_TOKEN="xxx" sh -
+curl -sfL https://get.k3s.io | K3S_URL="https://<ip or hostname of VIP ip>:6443" K3S_TOKEN="xxx" sh -
 
 # Verify that all nodes are present
 sudo kubectl get nodes
