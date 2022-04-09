@@ -12,6 +12,8 @@ A disadvantage is that this only runs in one container at a time so it's quite s
 To run commands in parrallel you could use this:
 
 ```sh
+#!/bin/bash
+
 for container in $(lxc-ls -1 --running); do
     lxc-attach -n "$container" -- /bin/bash -c "apt-get update && apt-get upgrade -y" &
 done
