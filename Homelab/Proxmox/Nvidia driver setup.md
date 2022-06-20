@@ -1,23 +1,36 @@
-# Nvidia driver setup
+# Nvidia driver setup for LXC use with Proxmox
 
 ## Details
 
-- Proxmox VE 6.3-2
+- Proxmox VE 7.2-4
 
 ### Proxmox Host setup
 
-1. Update header packeges `apt install pve-headers`
-2. Remove and disable any previous nouveau installations before installing nvidia drivers
-    - <https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#runfile-nouveau-debian>
-3. Follow the installation instructions [here](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#pre-installation-actions)
-4. Verify that the installation was sucessful by running `nvidia-smi`
-5. Reboot
+1. Add backports to your `/etc/apt/sources.list`
 
-### Get the GPU working in an LXC
+```sh
+deb http://deb.debian.org/debian buster-backports main contrib non-free | tee /etc/apt/sources.list
+```
 
-1. Follow these 2 guides:
-    - <https://forums.plex.tv/t/plex-hw-acceleration-in-lxc-container-anyone-with-success/219289/35>
-    - <https://medium.com/@MARatsimbazafy/journey-to-deep-learning-nvidia-gpu-passthrough-to-lxc-container-97d0bc474957>
+2. Install nvidia drivers:
+```sh
+curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-container-runtime/$(. /etc/os-release;echo $ID$VERSION_ID)/nvidia-container-runtime.list | tee /etc/apt/sources.list.d/nvidia-container-runtime.list
+apt update
+apt -y install pve-headers pkg-config
+apt -y install nvidia-driver nvidia-container-runtime nvidia-smi cuda # This may take a while
+```
+A reboot is recommended, but not necessary; you can check your driver installation and version by using `nvidia-smi`
+
+### LXC setup
+1. Add the following line to your `/etc/pve/lxc/<container-id>.conf`
+```
+lxc.hook.pre-start: sh -c '[ ! -f /dev/nvidia-uvm ] && /usr/bin/nvidia-modprobe -c0 -u'
+lxc.environment: NVIDIA_VISIBLE_DEVICES=all
+lxc.environment: NVIDIA_DRIVER_CAPABILITIES=all
+lxc.hook.mount: /usr/share/lxc/hooks/nvidia
+```
+And that's it, after rebooting your LXC you should now be able to use `nvidia-smi` in there as well.
 
 ### Tips
 
