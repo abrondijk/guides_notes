@@ -1,5 +1,11 @@
 # HA Cluster setup
 
+If a Ubuntu server 21.10 or newer is used on a Raspberry Pi, additional kernel modules have to be installed first by installing the package `sudo apt install linux-modules-extra-raspi`, and reboot.
+
+## Set hostnames
+
+Add hostnames for all nodes in every node's hosts file, as otherwise thousands of DNS requests will be made for those entries.
+
 ##  Installation with `k3sup`
 
 Initially tried with this, worked but preferred doing it manually as it makes you understand things more.
@@ -68,13 +74,19 @@ curl -sfL https://get.k3s.io | K3S_URL="https://<ip or hostname of initial maste
 
 Almost all below commands are executed from the inital master node
 
+Options for deploying on nodes:
+ - Add `--node-taint CriticalAddonsOnly=true:NoExecute` to nodes to avoid non-critical deployments from being scheduled there
+ - Add `--disable servicelb` to disable the built-in load-balancer service, meant for cloudproviders such as GCP, AWS, etc. A must if running on bare metal
+ - Add `--disable traefik` to disable the version of traefik that ships with `k3s`. Recommended as its usually outdated and way harder to customize
+ - Add `--disable local-storage` to disable the local path storageclass. Recommended as it will become obselete with the use of `longhorn`
+
 ```bash
 # Install k3s on initial master node
-curl -sfL https://get.k3s.io | K3S_TOKEN="xxx" sh -s - server --cluster-init --disable traefik --disable servicelb --tls-san cluster.example.com --node-taint CriticalAddonsOnly=true:NoExecute
+curl -sfL https://get.k3s.io | K3S_TOKEN="xxx" sh -s - server --cluster-init --disable traefik --disable servicelb --disable local-storage --tls-san cluster.example.com --node-taint CriticalAddonsOnly=true:NoExecute
 
 # Get RBAC config for required permissions
-curl https://kube-vip.io/manifests/rbac.yaml > rbac.yaml
-sudo cp rbac.yaml /var/lib/rancher/k3s/server/manifests/
+curl https://kube-vip.io/manifests/rbac.yaml > kube-vip-rbac.yaml
+sudo cp kube-vip-rbac.yaml /var/lib/rancher/k3s/server/manifests/
 
 # Export kube-vip configuration
 export VIP=<ip>
@@ -108,10 +120,10 @@ sudo kubectl get pods --all-namespaces
 sudo kubectl logs -n kube-system kube-vip-<id>
 
 # Add the other master nodes
-curl -sfL https://get.k3s.io | K3S_TOKEN="nnFEDhSAcKKeusXhSdnp" sh -s - server --server https://<ip or hostname of initial master node>:6443 --disable traefik --disable servicelb --tls-san cluster.example.com --node-taint CriticalAddonsOnly=true:NoExecute
+curl -sfL https://get.k3s.io | K3S_TOKEN="nnFEDhSAcKKeusXhSdnp" sh -s - server --server <ip or hostname of initial master node>:6443 --disable traefik --disable servicelb --disable local-storage --tls-san cluster.example.com --node-taint CriticalAddonsOnly=true:NoExecute
 
 # Add the worker nodes
-curl -sfL https://get.k3s.io | K3S_URL="https://<ip or hostname of VIP ip>:6443" K3S_TOKEN="xxx" sh -
+curl -sfL https://get.k3s.io | K3S_URL="<ip or hostname of VIP ip>:6443" K3S_TOKEN="xxx" sh -
 
 # Verify that all nodes are present
 sudo kubectl get nodes
@@ -142,14 +154,17 @@ configInline:
      addresses:
      - 10.0.20.201-10.0.20.250
 
+# Create namespace for metallb
+kubectl create namespace cattle-loadbalancing-system
+
 # Install metallb with config file
-helm install metallb metallb/metallb -f metallb.yaml
+helm install metallb metallb/metallb --namespace=cattle-loadbalancing-system -f metallb.yaml
 
 # Add the rancher repo to helm
 helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
 
 # Apply CRDs for cert-manager
-kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.1/cert-manager.crds.yaml
+kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.7.1/cert-manager.crds.yaml
 
 # Add jetstack repos to helm
 helm repo add jetstack https://charts.jetstack.io
@@ -161,7 +176,7 @@ helm repo update
 helm install cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --create-namespace \
-  --version v1.5.1
+  --version v1.7.1
 
 # WAIT for cert-manager to be fully installed, verify the installtion
 
@@ -208,7 +223,8 @@ kubectl create namespace cattle-system
 # Install rancher
 helm install rancher rancher-latest/rancher \
   --namespace cattle-system \
-  --set hostname=rancher.example.com
+  --set hostname=rancher.example.com \
+  --set bootstrapPassword=<temporary default password>
 
 # Wait for rancher to install, check the deployment
 kubectl -n cattle-system rollout status deploy/rancher
@@ -258,3 +274,18 @@ sudo rm -rf /etc/ceph \
 
 # Reboot
 ```
+
+Or with `ansible`:
+
+```bash
+
+# Uninstall k3s from the masters
+ansible masters -b -m shell -a "/usr/local/bin/k3s-uninstall.sh"
+
+# Uninstall k3s from the nodes
+ansible nodes -b -m shell -a "/usr/local/bin/k3s-agent-uninstall.sh"
+
+
+```
+
+https://github.com/longhorn/longhorn/issues/3207#issuecomment-998810462
