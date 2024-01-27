@@ -9,7 +9,7 @@
 1. Add backports to your `/etc/apt/sources.list`
 
 ```sh
-deb http://deb.debian.org/debian buster-backports main contrib non-free | tee /etc/apt/sources.list
+echo "deb http://deb.debian.org/debian buster main contrib non-free" | tee /etc/apt/sources.list
 ```
 
 2. Install nvidia drivers:
@@ -17,8 +17,7 @@ deb http://deb.debian.org/debian buster-backports main contrib non-free | tee /e
 curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | apt-key add -
 curl -s -L https://nvidia.github.io/nvidia-container-runtime/$(. /etc/os-release;echo $ID$VERSION_ID)/nvidia-container-runtime.list | tee /etc/apt/sources.list.d/nvidia-container-runtime.list
 apt update
-apt -y install pve-headers pkg-config
-apt -y install nvidia-driver nvidia-container-runtime nvidia-smi cuda # This may take a while
+apt -y install nvidia-container-runtime nvidia-smi cuda # This may take a while
 ```
 A reboot is recommended, but not necessary; you can check your driver installation and version by using `nvidia-smi`
 
