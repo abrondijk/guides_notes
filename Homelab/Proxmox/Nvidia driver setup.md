@@ -6,10 +6,15 @@
 
 ### Proxmox Host setup
 
-1. Add backports to your `/etc/apt/sources.list`
+1. Make your `/etc/apt/sources.list` look something like this
 
 ```sh
-echo "deb http://deb.debian.org/debian buster main contrib non-free" | tee /etc/apt/sources.list
+deb http://deb.debian.org/debian bookworm main contrib non-free non-free-firmware
+deb http://deb.debian.org/debian bookworm-updates main contrib non-free non-free-firmware
+deb http://deb.debian.org/debian bookworm-backports main contrib non-free non-free-firmware
+
+deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription
+deb http://security.debian.org/debian-security bookworm-security main contrib
 ```
 
 2. Install nvidia drivers:
